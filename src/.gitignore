@@ -22,3 +22,9 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+src/.env
+src/vendor
+src/node_modules
+src/storage/logs/*
+src/storage/framework/*
+mysql_data
