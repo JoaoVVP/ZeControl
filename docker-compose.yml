@@ -28,9 +28,9 @@ services:
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: laravel
-      MYSQL_USER: laravel
-      MYSQL_PASSWORD: secret
+      MYSQL_DATABASE: zeControl
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin
     volumes:
       - mysql_data:/var/lib/mysql
     ports:

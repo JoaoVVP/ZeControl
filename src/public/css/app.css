@@ -1,0 +1,77 @@
+/* ================================
+   ZeControl - Tema Ze Delivery
+   ================================ */
+
+:root {
+    --ze-yellow: #FFD200;
+    --ze-yellow-dark: #E6BC00;
+    --ze-dark: #1a1a1a;
+    --ze-dark-2: #242424;
+    --ze-dark-3: #2e2e2e;
+    --ze-gray: #adb5bd;
+    --ze-bg: #f0f2f5;
+}
+
+body {
+    background: var(--ze-bg);
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* ================================
+   Sidebar
+   ================================ */
+#sidebar {
+    width: 240px;
+    min-height: 100vh;
+    background: var(--ze-dark);
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+
+#sidebar .sidebar-brand {
+    padding: 20px 24px;
+    border-bottom: 1px solid #ffffff15;
+}
+
+#sidebar .sidebar-brand span {
+    color: var(--ze-yellow);
+    font-weight: bold;
+    font-size: 1.2rem;
+    letter-spacing: 1px;
+}
+
+#sidebar .menu-section {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #ffffff40;
+    padding: 16px 24px 4px;
+    margin: 0;
+}
+
+#sidebar .nav-link {
+    color: var(--ze-gray);
+    padding: 10px 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.95rem;
+    border-radius: 0;
+    transition: all 0.2s;
+}
+
+#sidebar .nav-link:hover,
+#sidebar .nav-link.active {
+    color: var(--ze-yellow);
+    background: var(--ze-dark-2);
+    border-left: 3px solid var(--ze-yellow);
+}
+
+/* ================================
+   Content
+   ================================ */
+#content {
+    margin-left: 240px;
+    padding: 32px;
+}
