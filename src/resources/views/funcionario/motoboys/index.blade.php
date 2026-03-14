@@ -1,13 +1,13 @@
 @extends('layouts.app')
 
-@section('title', 'Funcionários')
+@section('title', 'Motoboys')
 
 @section('content')
 
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h4 class="fw-bold mb-0">Funcionários</h4>
-        <a href="{{ route('admin.usuarios.create') }}" class="btn btn-ze">
-            <i class="bi bi-plus-lg"></i> Novo Funcionário
+        <h4 class="fw-bold mb-0">Motoboys</h4>
+        <a href="{{ route('funcionario.motoboys.create') }}" class="btn btn-ze">
+            <i class="bi bi-plus-lg"></i> Novo Motoboy
         </a>
     </div>
 
@@ -22,32 +22,35 @@
                     <tr>
                         <th>#</th>
                         <th>Nome</th>
-                        <th>Email</th>
-                        <th>Loja</th>
-                        <th>Situação</th>
+                        <th>Telefone</th>
+                        <th>Status</th>
                         <th>Cadastro</th>
                         <th></th>
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse($usuarios as $usuario)
+                    @forelse($motoboys as $motoboy)
                         <tr>
-                            <td class="text-muted small">{{ $usuario->id }}</td>
-                            <td>{{ $usuario->nome }}</td>
-                            <td>{{ $usuario->email }}</td>
-                            <td>{{ $usuario->loja->nome ?? '-' }}</td>
+                            <td class="text-muted small">{{ $motoboy->id }}</td>
+                            <td>{{ $motoboy->nome }}</td>
+                            <td>{{ $motoboy->telefone ?? '-' }}</td>
                             <td>
-                                @if($usuario->ativo)
-                                    <span class="badge bg-success">Ativo</span>
+                                @php $status = $motoboy->status @endphp
+                                @if($status === 'aguardando')
+                                    <span class="badge bg-warning text-dark">Na Fila</span>
+                                @elseif($status === 'em_rota')
+                                    <span class="badge bg-success">Em Rota</span>
+                                @elseif($status === 'disponivel')
+                                    <span class="badge bg-info">Disponível</span>
                                 @else
-                                    <span class="badge bg-danger">Inativo</span>
+                                    <span class="badge bg-secondary">Inativo</span>
                                 @endif
                             </td>
-                            <td>{{ $usuario->created_at->format('d/m/Y') }}</td>
+                            <td>{{ $motoboy->created_at->format('d/m/Y') }}</td>
                             <td class="text-end">
-                                <form action="{{ route('admin.usuarios.destroy', $usuario) }}"
+                                <form action="{{ route('funcionario.motoboys.destroy', $motoboy) }}"
                                       method="POST"
-                                      onsubmit="return confirm('Remover {{ $usuario->nome }}?')">
+                                      onsubmit="return confirm('Remover {{ $motoboy->nome }}?')">
                                     @csrf
                                     @method('DELETE')
                                     <button class="btn btn-sm btn-outline-danger">
@@ -58,8 +61,8 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="text-center text-muted py-3">
-                                Nenhum funcionário cadastrado ainda.
+                            <td colspan="6" class="text-center text-muted py-3">
+                                Nenhum motoboy cadastrado ainda.
                             </td>
                         </tr>
                     @endforelse
@@ -67,9 +70,9 @@
             </table>
         </div>
 
-        @if($usuarios->hasPages())
+        @if($motoboys->hasPages())
             <div class="card-footer bg-white border-0">
-                {{ $usuarios->links() }}
+                {{ $motoboys->links() }}
             </div>
         @endif
     </div>

@@ -34,10 +34,9 @@ class LoginController extends Controller
         $perfil = auth()->user()->perfil;
 
         return match($perfil) {
-            'admin'                    => redirect()->route('admin.dashboard'),
-            'dono', 'funcionario'      => redirect()->route('dashboard'),
-            'motoboy'                  => redirect()->route('motoboy.dashboard'),
-            default                    => redirect()->route('dashboard'),
+            'admin'        => redirect()->route('admin.dashboard'),
+            'funcionario'  => redirect()->route('funcionario.dashboard'),
+            'motoboy'      => redirect()->route('motoboy.dashboard'),
         };
     }
 
