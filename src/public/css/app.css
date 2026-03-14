@@ -75,3 +75,38 @@ body {
     margin-left: 240px;
     padding: 32px;
 }
+
+/* ================================
+   Header
+   ================================ */
+#header {
+    height: 56px;
+    background: #fff;
+    border-bottom: 1px solid #e0e0e0;
+    position: fixed;
+    top: 0;
+    left: 240px;
+    right: 0;
+    z-index: 99;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 32px;
+}
+
+#content {
+    margin-left: 240px;
+    padding: 32px;
+    margin-top: 56px; /* empurra o conteúdo abaixo do header */
+}
+
+#toggle-sistema {
+    cursor: pointer;
+    width: 40px;
+    height: 22px;
+}
+
+#toggle-sistema:checked {
+    background-color: var(--ze-yellow);
+    border-color: var(--ze-yellow-dark);
+}
