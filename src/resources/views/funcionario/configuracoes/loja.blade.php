@@ -1,0 +1,232 @@
+@extends('layouts.app')
+
+@section('title', 'Configurações da Loja')
+
+@section('content')
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="fw-bold mb-0">Configurações da Loja</h4>
+    </div>
+
+    @if(session('sucesso'))
+        <div class="alert alert-success py-2">{{ session('sucesso') }}</div>
+    @endif
+
+    <form method="POST" action="{{ route('funcionario.configuracoes.loja.update') }}">
+        @csrf
+        @method('PUT')
+
+        <div class="row g-4">
+
+            {{-- Credenciais Ze Delivery --}}
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white border-0 pt-3 d-flex justify-content-between align-items-center">
+                        <h6 class="fw-bold mb-0"><i class="bi bi-plug me-2"></i>Integração Zé Delivery</h6>
+                        @if($zeConfigurado)
+                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="editarZe()">
+                                <i class="bi bi-pencil"></i> Editar
+                            </button>
+                        @endif
+                    </div>
+                    <div class="card-body">
+
+                        @if($zeConfigurado)
+                            {{-- Modo leitura --}}
+                            <div id="ze-leitura">
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <label class="form-label text-muted small">Merchant ID</label>
+                                        <p class="fw-bold mb-0">••••••••</p>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label text-muted small">Client ID</label>
+                                        <p class="fw-bold mb-0">••••••••</p>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label text-muted small">Client Secret</label>
+                                        <p class="fw-bold mb-0">••••••••</p>
+                                    </div>
+                                </div>
+                                <p class="text-muted small mt-2 mb-0">
+                                    <i class="bi bi-shield-check text-success"></i>
+                                    Credenciais configuradas e criptografadas.
+                                </p>
+                            </div>
+
+                            {{-- Modo edição --}}
+                            <div id="ze-edicao" style="display:none">
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <label class="form-label">Merchant ID</label>
+                                        <input type="text" name="ze_merchant_id" class="form-control" placeholder="ID do estabelecimento">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Client ID</label>
+                                        <input type="text" name="ze_client_id" class="form-control" placeholder="Client ID">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Client Secret</label>
+                                        <input type="password" name="ze_client_secret" class="form-control" placeholder="••••••••">
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-outline-secondary btn-sm mt-2" onclick="cancelarEdicaoZe()">
+                                    <i class="bi bi-x"></i> Cancelar
+                                </button>
+                            </div>
+
+                        @else
+                            {{-- Nunca configurado --}}
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label class="form-label">Merchant ID</label>
+                                    <input type="text" name="ze_merchant_id" class="form-control" placeholder="ID do estabelecimento">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Client ID</label>
+                                    <input type="text" name="ze_client_id" class="form-control" placeholder="Client ID">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Client Secret</label>
+                                    <input type="password" name="ze_client_secret" class="form-control" placeholder="••••••••">
+                                </div>
+                            </div>
+                        @endif
+
+                    </div>
+                </div>
+            </div>
+
+            {{-- Pedidos por rota --}}
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white border-0 pt-3">
+                        <h6 class="fw-bold mb-0"><i class="bi bi-box-seam me-2"></i>Rotas</h6>
+                    </div>
+                    <div class="card-body">
+                        <label class="form-label">Pedidos por rota do motoboy</label>
+                        <input type="number"
+                               name="pedidos_por_rota"
+                               class="form-control"
+                               min="1"
+                               max="10"
+                               value="{{ old('pedidos_por_rota', $configuracao->pedidos_por_rota) }}"
+                               required>
+                        <div class="form-text">Quantidade máxima de pedidos que um motoboy carrega por saída.</div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Auto Start Route --}}
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white border-0 pt-3 d-flex justify-content-between align-items-center">
+                        <h6 class="fw-bold mb-0">
+                            <i class="bi bi-play-circle me-2 text-success"></i>Start Route Automático
+                        </h6>
+                        <div class="form-check form-switch mb-0">
+                            <input class="form-check-input"
+                                   type="checkbox"
+                                   name="auto_start_route"
+                                   id="auto_start_route"
+                                   {{ $configuracao->auto_start_route ? 'checked' : '' }}
+                                   onchange="toggleStartRoute(this)">
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted small mb-3">
+                            Quando ativado, o sistema chamará o <strong>startRoute</strong> automaticamente
+                            após X minutos da primeira nota associada ao motoboy.
+                        </p>
+
+                        <div id="start-route-config" style="{{ $configuracao->auto_start_route ? '' : 'display:none' }}">
+                            <label class="form-label">Tempo para start automático (minutos)</label>
+                            <input type="number"
+                                   name="start_route_minutos"
+                                   class="form-control"
+                                   min="1"
+                                   max="60"
+                                   value="{{ old('start_route_minutos', $configuracao->start_route_minutos) }}"
+                                   placeholder="Ex: 10">
+                            <div class="form-text">Tempo após a primeira nota para iniciar a rota automaticamente.</div>
+                        </div>
+
+                        <div id="start-route-desativado" style="{{ $configuracao->auto_start_route ? 'display:none' : '' }}">
+                            <p class="text-muted small mb-0">Ative para configurar o tempo de start automático.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Modo Emergência --}}
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white border-0 pt-3 d-flex justify-content-between align-items-center">
+                        <h6 class="fw-bold mb-0">
+                            <i class="bi bi-exclamation-triangle me-2 text-warning"></i>Modo Emergência
+                        </h6>
+                        <div class="form-check form-switch mb-0">
+                            <input class="form-check-input"
+                                   type="checkbox"
+                                   name="modo_emergencia"
+                                   id="modo_emergencia"
+                                   {{ $configuracao->modo_emergencia ? 'checked' : '' }}>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted small mb-3">
+                            Quando ativado e o gatilho for atingido, o sistema passa a agrupar pedidos por
+                            <strong>ordem de saída + proximidade</strong> em vez de apenas ordem de saída.
+                        </p>
+                        <label class="form-label">Gatilho — pedidos em separação sem motoboy na fila</label>
+                        <input type="number"
+                               name="gatilho_emergencia"
+                               class="form-control"
+                               min="1"
+                               value="{{ old('gatilho_emergencia', $configuracao->gatilho_emergencia) }}"
+                               required>
+                        <div class="form-text">Ex: 5 pedidos acumulados sem nenhum motoboy disponível.</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="mt-4">
+            <button type="submit" class="btn btn-ze">
+                <i class="bi bi-check-lg"></i> Salvar Configurações
+            </button>
+        </div>
+
+    </form>
+
+@endsection
+
+@push('scripts')
+<script>
+    function toggleStartRoute(checkbox) {
+        const config     = document.getElementById('start-route-config');
+        const desativado = document.getElementById('start-route-desativado');
+        if (checkbox.checked) {
+            config.style.display     = '';
+            desativado.style.display = 'none';
+        } else {
+            config.style.display     = 'none';
+            desativado.style.display = '';
+        }
+    }
+
+    function editarZe() {
+        document.getElementById('ze-leitura').style.display = 'none';
+        document.getElementById('ze-edicao').style.display  = '';
+        // Troca botão Editar por Cancelar no header
+        document.querySelector('[onclick="editarZe()"]').style.display = 'none';
+    }
+
+    function cancelarEdicaoZe() {
+        document.getElementById('ze-leitura').style.display = '';
+        document.getElementById('ze-edicao').style.display  = 'none';
+        document.querySelector('[onclick="editarZe()"]').style.display = '';
+    }
+</script>
+@endpush
