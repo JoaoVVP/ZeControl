@@ -42,6 +42,10 @@
                class="nav-link {{ request()->routeIs('funcionario.rotas.*') ? 'active' : '' }}">
                 <i class="bi bi-geo-alt-fill"></i> Rotas
             </a>
+            <a href="{{ route('funcionario.configuracoes.loja') }}"
+            class="nav-link {{ request()->routeIs('funcionario.configuracoes.loja*') ? 'active' : '' }}">
+                <i class="bi bi-shop"></i> Configurações da Loja
+            </a>
 
             <p class="menu-section">Sistema</p>
             <a href="{{ route('funcionario.configuracoes') }}"

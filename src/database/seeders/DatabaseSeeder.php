@@ -19,4 +19,12 @@ class DatabaseSeeder extends Seeder
             LojaSeeder::class,
         ]);
     }
+
+    public function run(): void
+    {
+        $this->call([
+            LojaSeeder::class,
+            PedidoMockSeeder::class,
+        ]);
+    }
 }
