@@ -110,3 +110,14 @@ body {
     background-color: var(--ze-yellow);
     border-color: var(--ze-yellow-dark);
 }
+
+.btn-ze {
+    background: var(--ze-yellow);
+    color: var(--ze-dark);
+    font-weight: bold;
+    border: none;
+}
+.btn-ze:hover {
+    background: var(--ze-yellow-dark);
+    color: var(--ze-dark);
+}
