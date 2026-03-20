@@ -41,6 +41,18 @@ services:
     container_name: laravel_redis
     ports:
       - "6379:6379"
+    
+  waha:
+    image: devlikeapro/waha
+    container_name: laravel_waha
+    ports:
+      - "8081:3000"
+    volumes:
+      - waha_data:/app/.sessions
+    environment:
+      - WHATSAPP_API_KEY=zecontrol_wpp_key
+    restart: always
 
 volumes:
   mysql_data:
+  waha_data:
