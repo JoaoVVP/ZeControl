@@ -20,6 +20,10 @@
                class="nav-link {{ request()->routeIs('admin.usuarios.*') ? 'active' : '' }}">
                 <i class="bi bi-people"></i> Funcionários
             </a>
+            <a href="{{ route('admin.configuracoes') }}"
+                class="nav-link {{ request()->routeIs('admin.configuracoes*') ? 'active' : '' }}">
+                <i class="bi bi-gear"></i> Configurações
+            </a>
 
         @elseif(auth()->user()->perfil === 'funcionario')
 

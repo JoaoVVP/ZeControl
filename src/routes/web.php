@@ -13,6 +13,7 @@ use App\Http\Controllers\ConfiguracaoController;
 use App\Http\Controllers\Funcionario\ConfiguracaoLojaController;
 use App\Http\Controllers\Funcionario\RotaController;
 use App\Http\Controllers\Funcionario\SaidaController;
+use App\Http\Controllers\Admin\ConfiguracaoSistemaController;
 
 
 
@@ -22,6 +23,13 @@ Route::post('/login', [LoginController::class, 'login'])->name('login.submit');
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 Route::middleware('auth')->group(function () {
+    // Apenas em desenvolvimento
+    if (app()->environment('local')) {
+        Route::get('/mock/pedido/{loja_id}/{numero?}', function ($lojaId, $numero = '100000001') {
+            \App\Jobs\ProcessarPedidoMockJob::dispatch($lojaId, $numero);
+            return response()->json(['message' => 'Job disparado!', 'numero' => $numero]);
+        })->middleware('auth')->name('mock.pedido');
+    }
 
     // Admin
     Route::prefix('admin')->name('admin.')->group(function () {
@@ -31,6 +39,12 @@ Route::middleware('auth')->group(function () {
         Route::get('/configuracoes', [ConfiguracaoController::class, 'index'])->name('configuracoes');
         Route::put('/configuracoes/perfil', [ConfiguracaoController::class, 'atualizarPerfil'])->name('configuracoes.perfil');
         Route::put('/configuracoes/senha', [ConfiguracaoController::class, 'atualizarSenha'])->name('configuracoes.senha');
+        Route::get('/configuracoes', [ConfiguracaoSistemaController::class, 'index'])->name('configuracoes');
+        Route::put('/configuracoes', [ConfiguracaoSistemaController::class, 'update'])->name('configuracoes.update');
+        Route::post('/configuracoes/qrcode', [ConfiguracaoSistemaController::class, 'gerarQrCode'])->name('configuracoes.qrcode');
+        Route::get('/configuracoes/waha/status', [ConfiguracaoSistemaController::class, 'statusWaha'])->name('configuracoes.waha.status');
+        Route::post('/configuracoes/waha/desconectar', [ConfiguracaoSistemaController::class, 'desconectar'])->name('configuracoes.waha.desconectar');
+        Route::get('/configuracoes/waha/qr', [ConfiguracaoSistemaController::class, 'qrCodeImagem'])->name('configuracoes.waha.qr');
     });
 
     // Funcionário

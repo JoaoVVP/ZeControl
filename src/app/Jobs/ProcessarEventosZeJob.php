@@ -27,11 +27,15 @@ class ProcessarEventosZeJob implements ShouldQueue
         foreach ($eventos as $evento) {
             $numeroPedido = (string) $evento['orderId'];
 
-            match ($evento['eventType']) {
-                'CREATED' => $this->processarCriado($ze, $pedidoService, $loja, $numeroPedido, $evento),
-                'CANCELLED', 'CONCLUDED' => $pedidoService->esquecer($loja->id, $numeroPedido),
-                default => null,
-            };
+        match ($evento['eventType']) {
+            'CREATED'   => $this->processarCriado($ze, $pedidoService, $loja, $numeroPedido, $evento),
+            'DISPATCHED'=> $pedidoService->marcarEmRota(
+                                (int) Redis::get("pedido_motoboy:{$numeroPedido}")
+                        ),
+            'CANCELLED' => $pedidoService->cancelarPedido($loja->id, $numeroPedido),
+            'CONCLUDED' => $pedidoService->esquecer($loja->id, $numeroPedido),
+            default     => null,
+        };
 
             $processados[] = $evento;
         }
