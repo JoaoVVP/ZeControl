@@ -15,16 +15,18 @@
     @stack('styles')
 </head>
 <body>
-
+    
     @include('partials.sidebar')
     @include('partials.header')
-
+    
     <div id="content">
         @yield('content')
     </div>
-
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
+    
     @stack('scripts')
+    
+    <script src="{{ asset('js/app.js') }}"></script>
 </body>
 </html>

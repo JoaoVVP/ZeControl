@@ -15,13 +15,21 @@ class ConfiguracaoLoja extends Model
         'gatilho_emergencia',
         'auto_start_route',
         'start_route_minutos',
+        'turbo_casa',
+        'turbo_prazo_minutos',
+        'turbo_espera_casa_minutos',
+        'turbo_preferencia',
+        'turbo_casa_modo_emergencia',
     ];
 
     protected function casts(): array
     {
         return [
-            'modo_emergencia'  => 'boolean',
-            'auto_start_route' => 'boolean',
+            'modo_emergencia'           => 'boolean',
+            'auto_start_route'          => 'boolean',
+            'turbo_casa'                => 'boolean',
+            'turbo_preferencia'         => 'boolean',
+            'turbo_casa_modo_emergencia' => 'boolean',
         ];
     }
 

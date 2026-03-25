@@ -191,6 +191,84 @@
             </div>
 
         </div>
+        
+        {{-- Turbo --}}
+
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0 pt-3">
+                    <h6 class="fw-bold mb-0">
+                        <i class="bi bi-lightning-charge text-warning me-2"></i>Configurações Turbo
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+
+                        <div class="col-md-4">
+                            <label class="form-label">Prazo para sair (minutos)</label>
+                            <input type="number"
+                                name="turbo_prazo_minutos"
+                                class="form-control"
+                                min="1"
+                                value="{{ old('turbo_prazo_minutos', $configuracao->turbo_prazo_minutos) }}">
+                            <div class="form-text">Tempo máximo para startRoute da turbo.</div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">Espera para casar (minutos)</label>
+                            <input type="number"
+                                name="turbo_espera_casa_minutos"
+                                class="form-control"
+                                min="1"
+                                value="{{ old('turbo_espera_casa_minutos', $configuracao->turbo_espera_casa_minutos) }}">
+                            <div class="form-text">Tempo de espera por nota comum para casar.</div>
+                        </div>
+
+                        <div class="col-md-4 d-flex flex-column gap-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <label class="form-label mb-0">Turbo pode casar</label>
+                                    <div class="form-text">Turbo pode agrupar com nota comum.</div>
+                                </div>
+                                <div class="form-check form-switch mb-0">
+                                    <input class="form-check-input"
+                                        type="checkbox"
+                                        name="turbo_casa"
+                                        {{ $configuracao->turbo_casa ? 'checked' : '' }}>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <label class="form-label mb-0">Casar no modo emergência</label>
+                                    <div class="form-text">Turbo pode casar quando emergência ativa.</div>
+                                </div>
+                                <div class="form-check form-switch mb-0">
+                                    <input class="form-check-input"
+                                        type="checkbox"
+                                        name="turbo_casa_modo_emergencia"
+                                        {{ $configuracao->turbo_casa_modo_emergencia ? 'checked' : '' }}>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <label class="form-label mb-0">Preferência na fila</label>
+                                    <div class="form-text">Motoboy que saiu sozinho com turbo tem prioridade.</div>
+                                </div>
+                                <div class="form-check form-switch mb-0">
+                                    <input class="form-check-input"
+                                        type="checkbox"
+                                        name="turbo_preferencia"
+                                        {{ $configuracao->turbo_preferencia ? 'checked' : '' }}>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <div class="mt-4">
             <button type="submit" class="btn btn-ze">

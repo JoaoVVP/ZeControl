@@ -21,17 +21,25 @@ class WahaService
     public function enviarMensagem(string $numero, string $mensagem): bool
     {
         try {
+            $chatId = $this->formatarNumero($numero);
+
+            Log::info('WAHA enviando mensagem', [
+                'numero_original' => $numero,
+                'chatId'          => $chatId,
+            ]);
+
             $response = Http::timeout(10)
                 ->withHeaders(['X-Api-Key' => $this->apiKey])
                 ->post("{$this->url}/api/sendText", [
                     'session' => $this->session,
-                    'chatId'  => $this->formatarNumero($numero),
+                    'chatId'  => $chatId,
                     'text'    => $mensagem,
                 ]);
 
             if ($response->failed()) {
                 Log::error('WAHA erro ao enviar mensagem', [
                     'numero'   => $numero,
+                    'chatId'   => $chatId,
                     'status'   => $response->status(),
                     'response' => $response->json(),
                 ]);
@@ -51,16 +59,6 @@ class WahaService
 
     private function formatarNumero(string $numero): string
     {
-        $numero = preg_replace('/\D/', '', $numero);
-
-        if (strlen($numero) === 11) {
-            $numero = '55' . $numero;
-        }
-
-        if (strlen($numero) === 12) {
-            $numero = substr($numero, 0, 4) . '9' . substr($numero, 4);
-        }
-
         return $numero . '@c.us';
     }
 }

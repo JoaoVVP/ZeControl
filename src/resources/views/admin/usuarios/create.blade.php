@@ -14,16 +14,6 @@
     <div class="card border-0 shadow-sm">
         <div class="card-body">
 
-            @if($errors->any())
-                <div class="alert alert-danger py-2 small">
-                    <ul class="mb-0">
-                        @foreach($errors->all() as $erro)
-                            <li>{{ $erro }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
-
             <form method="POST" action="{{ route('admin.usuarios.store') }}">
                 @csrf
 
@@ -32,29 +22,38 @@
                         <label class="form-label">Nome</label>
                         <input type="text"
                                name="nome"
-                               class="form-control"
+                               class="form-control {{ $errors->has('nome') ? 'is-invalid' : '' }}"
                                value="{{ old('nome') }}"
                                placeholder="Nome completo"
                                required>
+                        @error('nome')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
 
                     <div class="col-md-6">
                         <label class="form-label">Email</label>
                         <input type="email"
                                name="email"
-                               class="form-control"
+                               class="form-control {{ $errors->has('email') ? 'is-invalid' : '' }}"
                                value="{{ old('email') }}"
                                placeholder="funcionario@email.com"
                                required>
+                        @error('email')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
 
                     <div class="col-md-6">
                         <label class="form-label">Senha</label>
                         <input type="password"
                                name="password"
-                               class="form-control"
+                               class="form-control {{ $errors->has('password') ? 'is-invalid' : '' }}"
                                placeholder="Mínimo 6 caracteres"
                                required>
+                        @error('password')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
 
                     <div class="col-md-6">
@@ -68,7 +67,9 @@
 
                     <div class="col-md-6">
                         <label class="form-label">Loja</label>
-                        <select name="loja_id" class="form-select" required>
+                        <select name="loja_id"
+                                class="form-select {{ $errors->has('loja_id') ? 'is-invalid' : '' }}"
+                                required>
                             <option value="">Selecione a loja</option>
                             @foreach($lojas as $loja)
                                 <option value="{{ $loja->id }}"
@@ -77,6 +78,9 @@
                                 </option>
                             @endforeach
                         </select>
+                        @error('loja_id')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
                 </div>
 

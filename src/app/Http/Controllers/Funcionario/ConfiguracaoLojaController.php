@@ -53,16 +53,21 @@ class ConfiguracaoLojaController extends Controller
             ]);
         }
 
-        ConfiguracaoLoja::updateOrCreate(
-            ['loja_id' => $loja->id],
-            [
-                'pedidos_por_rota'    => $request->pedidos_por_rota,
-                'modo_emergencia'     => $request->boolean('modo_emergencia'),
-                'gatilho_emergencia'  => $request->gatilho_emergencia,
-                'auto_start_route'    => $request->boolean('auto_start_route'),
-                'start_route_minutos' => $request->start_route_minutos,
-            ]
-        );
+    ConfiguracaoLoja::updateOrCreate(
+        ['loja_id' => $loja->id],
+        [
+            'pedidos_por_rota'           => $request->pedidos_por_rota,
+            'modo_emergencia'            => $request->boolean('modo_emergencia'),
+            'gatilho_emergencia'         => $request->gatilho_emergencia,
+            'auto_start_route'           => $request->boolean('auto_start_route'),
+            'start_route_minutos'        => $request->start_route_minutos,
+            'turbo_casa'                 => $request->boolean('turbo_casa'),
+            'turbo_prazo_minutos'        => $request->turbo_prazo_minutos,
+            'turbo_espera_casa_minutos'  => $request->turbo_espera_casa_minutos,
+            'turbo_preferencia'          => $request->boolean('turbo_preferencia'),
+            'turbo_casa_modo_emergencia' => $request->boolean('turbo_casa_modo_emergencia'),
+        ]
+    );
 
         return back()->with('sucesso', 'Configurações salvas com sucesso!');
     }

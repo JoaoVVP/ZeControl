@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\Formatter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -21,8 +22,8 @@ class ConfiguracaoController extends Controller
         ]);
 
         auth()->user()->update([
-            'nome'  => $request->nome,
-            'email' => $request->email,
+            'nome'  => Formatter::nome($request->nome),
+            'email' => Formatter::email($request->email),
         ]);
 
         return back()->with('sucesso', 'Perfil atualizado com sucesso!');

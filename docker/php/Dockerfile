@@ -5,7 +5,8 @@ RUN apt-get update && apt-get install -y \
     unzip \
     curl \
     libzip-dev \
-    cron
+    cron \
+    supervisor
 
 RUN docker-php-ext-install pdo pdo_mysql zip
 
@@ -16,6 +17,7 @@ RUN echo "* * * * * root cd /var/www && php artisan schedule:run >> /dev/null 2>
 RUN chmod 0644 /etc/cron.d/laravel-scheduler
 RUN crontab /etc/cron.d/laravel-scheduler
 
+COPY ./supervisor.conf /etc/supervisor/conf.d/laravel.conf
 COPY ./start.sh /start.sh
 RUN chmod +x /start.sh
 

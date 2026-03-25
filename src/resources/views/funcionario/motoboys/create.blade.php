@@ -14,16 +14,6 @@
     <div class="card border-0 shadow-sm">
         <div class="card-body">
 
-            @if($errors->any())
-                <div class="alert alert-danger py-2 small">
-                    <ul class="mb-0">
-                        @foreach($errors->all() as $erro)
-                            <li>{{ $erro }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
-
             <form method="POST" action="{{ route('funcionario.motoboys.store') }}">
                 @csrf
 
@@ -32,38 +22,51 @@
                         <label class="form-label">Nome</label>
                         <input type="text"
                                name="nome"
-                               class="form-control"
+                               class="form-control {{ $errors->has('nome') ? 'is-invalid' : '' }}"
                                value="{{ old('nome') }}"
                                placeholder="Nome completo"
                                required>
+                        @error('nome')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
 
                     <div class="col-md-6">
                         <label class="form-label">Telefone</label>
                         <input type="text"
                                name="telefone"
-                               class="form-control"
+                               data-mask="telefone"
+                               class="form-control {{ $errors->has('telefone') ? 'is-invalid' : '' }}"
                                value="{{ old('telefone') }}"
                                placeholder="(21) 99999-9999">
+                        @error('telefone')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
 
                     <div class="col-md-6">
                         <label class="form-label">Email</label>
                         <input type="email"
                                name="email"
-                               class="form-control"
+                               class="form-control {{ $errors->has('email') ? 'is-invalid' : '' }}"
                                value="{{ old('email') }}"
                                placeholder="motoboy@email.com"
                                required>
+                        @error('email')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
 
                     <div class="col-md-3">
                         <label class="form-label">Senha</label>
                         <input type="password"
                                name="password"
-                               class="form-control"
+                               class="form-control {{ $errors->has('password') ? 'is-invalid' : '' }}"
                                placeholder="Mínimo 6 caracteres"
                                required>
+                        @error('password')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
 
                     <div class="col-md-3">

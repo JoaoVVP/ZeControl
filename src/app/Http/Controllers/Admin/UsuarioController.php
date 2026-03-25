@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Loja;
 use App\Models\Usuario;
+use App\Helpers\Formatter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -33,19 +34,33 @@ class UsuarioController extends Controller
             'nome'     => 'required|string|max:255',
             'email'    => 'required|email|unique:usuarios,email',
             'password' => 'required|min:6|confirmed',
+        ], [
+            'email.unique' => 'Esse email já está sendo usado por outro usuário.',
         ]);
+
+        // Verifica nome único por loja
+        $nomeFormatado = Formatter::nome($request->nome);
+        $nomeExiste = Usuario::where('loja_id', $request->loja_id)
+                            ->where('nome', $nomeFormatado)
+                            ->exists();
+
+        if ($nomeExiste) {
+            return back()
+                ->withInput()
+                ->withErrors(['nome' => 'Já existe um funcionário com esse nome nessa loja.']);
+        }
 
         Usuario::create([
             'loja_id'  => $request->loja_id,
-            'nome'     => $request->nome,
-            'email'    => $request->email,
+            'nome'     => $nomeFormatado,
+            'email'    => Formatter::email($request->email),
             'password' => Hash::make($request->password),
             'perfil'   => 'funcionario',
             'ativo'    => true,
         ]);
 
         return redirect()->route('admin.usuarios.index')
-                         ->with('sucesso', 'Funcionário cadastrado com sucesso!');
+                        ->with('sucesso', 'Funcionário cadastrado com sucesso!');
     }
 
     public function destroy(Usuario $usuario)
