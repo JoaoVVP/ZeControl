@@ -153,50 +153,96 @@ class ProcessarEventosZeJob implements ShouldQueue
     // DISPATCHED → WhatsApp + marcar em rota
     // ==========================================
     private function processarDispatched(
-        PedidoService $pedidoService,
-        WahaService   $waha,
-        Loja          $loja,
-        string        $numeroPedido
+        PedidoService     $pedidoService,
+        WahaService       $waha,
+        ZeDeliveryService $ze,
+        Loja              $loja,
+        string            $numeroPedido
     ): void {
         $motoboyId = Redis::get("pedido_motoboy:{$numeroPedido}");
+
+        // Pedido não está no nosso Redis — foi escaneado diretamente pelo motoboy
         if (!$motoboyId) {
-            Log::warning('[ZE] DISPATCHED — motoboy não encontrado no Redis', ['numero' => $numeroPedido]);
+            Log::info('[ZE] DISPATCHED — pedido fora do fluxo, buscando entregador na API', [
+                'numero' => $numeroPedido,
+            ]);
+
+            // Busca quem está com o pedido na API Ze
+            $detalhes = $ze->buscarDetalhesEntrega($loja, $numeroPedido);
+            if (!$detalhes) return;
+
+            $emailMotoboy = $detalhes['deliveryMan']['email'] ?? null;
+            if (!$emailMotoboy) return;
+
+            // Busca motoboy pelo email
+            $usuario = \App\Models\Usuario::where('email', $emailMotoboy)->first();
+            if (!$usuario) return;
+
+            $motoboy = \App\Models\Motoboy::where('usuario_id', $usuario->id)->first();
+            if (!$motoboy) return;
+
+            // Salva pedido no Redis associado ao motoboy
+            $payload = $ze->buscarPedido($loja, $numeroPedido);
+            if ($payload) {
+                Redis::set("pedido:{$loja->id}:{$numeroPedido}", json_encode($payload));
+                Redis::rpush("motoboy_pedidos:{$motoboy->id}", $numeroPedido);
+                Redis::set("pedido_motoboy:{$numeroPedido}", $motoboy->id);
+            }
+
+            // Marca em rota
+            $pedidoService->marcarEmRota($motoboy->id);
+
+            // Envia WhatsApp
+            if ($motoboy->telefone && $payload) {
+                $this->enviarWhatsAppDispatched($waha, $motoboy, $numeroPedido, $payload);
+            }
+
             return;
         }
 
-        $motoboy = Motoboy::find($motoboyId);
+        // Fluxo normal — pedido estava no Redis
+        $motoboy = \App\Models\Motoboy::find($motoboyId);
         if (!$motoboy) return;
 
-        // Marca motoboy como em rota
         $pedidoService->marcarEmRota((int) $motoboyId);
 
-        // Envia WhatsApp
         if ($motoboy->telefone) {
-            $payload  = $pedidoService->buscar($loja->id, $numeroPedido);
-            $endereco = $payload['delivery']['deliveryAddress']['formattedAddress'] ?? '-';
-            $cliente  = $payload['customer']['name'] ?? '-';
-            $telefone = $payload['customer']['phone']['number'] ?? '-';
-            $total    = $payload['total']['orderAmount']['value'] ?? '-';
-            $itens    = collect($payload['items'] ?? [])
-                ->map(fn($i) => "• {$i['quantity']}x {$i['name']}")
-                ->join("\n");
-
-            $mensagem  = "🛵 *Olá, {$motoboy->nome}!*\n\n";
-            $mensagem .= "📦 *Pedido: #{$numeroPedido} despachado!*\n\n";
-            $mensagem .= "*Itens:*\n{$itens}\n\n";
-            $mensagem .= "📍 *Endereço:*\n{$endereco}\n\n";
-            $mensagem .= "👤 *Cliente:* {$cliente}\n";
-            $mensagem .= "📞 *Telefone:* {$telefone}\n\n";
-            $mensagem .= "💰 *Total: R$ {$total}*\n\n";
-            $mensagem .= "✅ Siga para o endereço de entrega!";
-
-            $waha->enviarMensagem($motoboy->telefone, $mensagem);
-
-            Log::info('[ZE] DISPATCHED — WhatsApp enviado', [
-                'numero'  => $numeroPedido,
-                'motoboy' => $motoboy->nome,
-            ]);
+            $payload = $pedidoService->buscar($loja->id, $numeroPedido);
+            if ($payload) {
+                $this->enviarWhatsAppDispatched($waha, $motoboy, $numeroPedido, $payload);
+            }
         }
+    }
+
+    private function enviarWhatsAppDispatched(
+        WahaService $waha,
+        \App\Models\Motoboy $motoboy,
+        string $numeroPedido,
+        array $payload
+    ): void {
+        $endereco = $payload['delivery']['deliveryAddress']['formattedAddress'] ?? '-';
+        $cliente  = $payload['customer']['name'] ?? '-';
+        $telefone = $payload['customer']['phone']['number'] ?? '-';
+        $total    = $payload['total']['orderAmount']['value'] ?? '-';
+        $itens    = collect($payload['items'] ?? [])
+            ->map(fn($i) => "• {$i['quantity']}x {$i['name']}")
+            ->join("\n");
+
+        $mensagem  = "🛵 *Olá, {$motoboy->nome}!*\n\n";
+        $mensagem .= "📦 *Pedido: #{$numeroPedido} despachado!*\n\n";
+        $mensagem .= "*Itens:*\n{$itens}\n\n";
+        $mensagem .= "📍 *Endereço:*\n{$endereco}\n\n";
+        $mensagem .= "👤 *Cliente:* {$cliente}\n";
+        $mensagem .= "📞 *Telefone:* {$telefone}\n\n";
+        $mensagem .= "💰 *Total: R$ {$total}*\n\n";
+        $mensagem .= "✅ Siga para o endereço de entrega!";
+
+        $enviado = $waha->enviarMensagem($motoboy->telefone, $mensagem);
+
+        Log::info('[ZE] DISPATCHED — WhatsApp ' . ($enviado ? 'enviado' : 'falhou'), [
+            'motoboy'  => $motoboy->nome,
+            'telefone' => $motoboy->telefone,
+        ]);
     }
 
     // ==========================================
