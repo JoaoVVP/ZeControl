@@ -71,4 +71,36 @@ class ConfiguracaoLojaController extends Controller
 
         return back()->with('sucesso', 'Configurações salvas com sucesso!');
     }
+    
+    public function salvarLocalizacao(Request $request)
+    {
+        $request->validate([
+            'lat' => 'required|numeric',
+            'lng' => 'required|numeric',
+        ]);
+
+        $loja = auth()->user()->loja;
+
+        ConfiguracaoLoja::updateOrCreate(
+            ['loja_id' => $loja->id],
+            [
+                'loja_lat' => $request->lat,
+                'loja_lng' => $request->lng,
+            ]
+        );
+
+        return response()->json(['sucesso' => true]);
+    }
+
+    public function excluirLocalizacao()
+    {
+        $loja = auth()->user()->loja;
+
+        ConfiguracaoLoja::where('loja_id', $loja->id)->update([
+            'loja_lat' => null,
+            'loja_lng' => null,
+        ]);
+
+        return back()->with('aviso', 'Local da loja excluído! Configure um novo local para que os motoboys consigam entrar na fila.');
+    }
 }

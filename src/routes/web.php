@@ -61,6 +61,8 @@ Route::middleware('auth')->group(function () {
         Route::put('/configuracoes/perfil', [ConfiguracaoController::class, 'atualizarPerfil'])->name('configuracoes.perfil');
         Route::put('/configuracoes/senha', [ConfiguracaoController::class, 'atualizarSenha'])->name('configuracoes.senha');
         Route::get('/configuracoes/loja', [ConfiguracaoLojaController::class, 'index'])->name('configuracoes.loja');
+        Route::post('/configuracoes/loja/localizacao', [ConfiguracaoLojaController::class, 'salvarLocalizacao'])->name('configuracoes.loja.localizacao');
+        Route::delete('/configuracoes/loja/localizacao', [ConfiguracaoLojaController::class, 'excluirLocalizacao'])->name('configuracoes.loja.localizacao.excluir');
         Route::put('/configuracoes/loja', [ConfiguracaoLojaController::class, 'update'])->name('configuracoes.loja.update');
     });
 

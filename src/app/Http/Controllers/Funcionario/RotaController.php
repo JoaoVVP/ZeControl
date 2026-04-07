@@ -10,10 +10,14 @@ class RotaController extends Controller
 {
     public function index()
     {
-        $lojaId = auth()->user()->loja_id;
-        $rotas  = Rota::where('loja_id', $lojaId)->latest()->get();
+        $lojaId       = auth()->user()->loja_id;
+        $rotas        = Rota::where('loja_id', $lojaId)->latest()->get();
+        $configuracao = \App\Models\ConfiguracaoLoja::firstOrCreate(
+            ['loja_id' => $lojaId],
+            ['pedidos_por_rota' => 1, 'modo_emergencia' => false, 'gatilho_emergencia' => 5]
+        );
 
-        return view('funcionario.rotas.index', compact('rotas'));
+        return view('funcionario.rotas.index', compact('rotas', 'configuracao'));
     }
 
     public function create()

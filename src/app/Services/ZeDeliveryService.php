@@ -202,4 +202,18 @@ class ZeDeliveryService
 
         return $response->successful();
     }
+
+    public function buscarDetalhesEntrega(Loja $loja, string $numeroPedido): ?array
+    {
+        $token = $this->getToken($loja);
+        if (!$token) return null;
+
+        $response = Http::withHeaders([
+            'Authorization' => "Bearer {$token}",
+        ])->get($this->endpoint('ZE_LOGISTICS_DELIVERY', ['orderNumber' => $numeroPedido]));
+
+        if ($response->failed()) return null;
+
+        return $response->json();
+    }
 }

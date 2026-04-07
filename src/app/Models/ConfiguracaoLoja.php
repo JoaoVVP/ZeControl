@@ -20,6 +20,8 @@ class ConfiguracaoLoja extends Model
         'turbo_espera_casa_minutos',
         'turbo_preferencia',
         'turbo_casa_modo_emergencia',
+        'loja_lat',
+        'loja_lng',
     ];
 
     protected function casts(): array
